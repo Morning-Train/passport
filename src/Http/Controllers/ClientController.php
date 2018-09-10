@@ -64,7 +64,7 @@ class ClientController
         ])->validate();
 
         return $this->clients->create(
-            $request->user()->getKey(), $request->name, $request->redirect
+            $request->user()->getKey(), get_class($request->user()), $request->name, $request->redirect
         )->makeVisible('secret');
     }
 

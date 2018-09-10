@@ -101,14 +101,12 @@ class PersonalAccessTokenControllerTest extends PHPUnit_Framework_TestCase
     public function test_not_found_response_is_returned_if_user_doesnt_have_token()
     {
         $request = Request::create('/', 'GET');
+		$user = new PersonalAccessTokenControllerFakeUser();
 
         $tokenRepository = Mockery::mock(TokenRepository::class);
-        $tokenRepository->shouldReceive('findForUser')->with(3, 1)->andReturnNull();
+        $tokenRepository->shouldReceive('findForUser')->with(3, $user)->andReturnNull();
 
-        $request->setUserResolver(function () {
-            $user = Mockery::mock();
-            $user->shouldReceive('getKey')->andReturn(1);
-
+        $request->setUserResolver(function () use ($user) {
             return $user;
         });
 
@@ -116,5 +114,14 @@ class PersonalAccessTokenControllerTest extends PHPUnit_Framework_TestCase
         $controller = new Laravel\Passport\Http\Controllers\PersonalAccessTokenController($tokenRepository, $validator);
 
         $this->assertEquals(404, $controller->destroy($request, 3)->status());
+    }
+}
+
+class PersonalAccessTokenControllerFakeUser
+{
+    public $id = 1;
+    public function getKey()
+    {
+        return $this->id;
     }
 }

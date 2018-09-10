@@ -77,7 +77,7 @@ class ClientController
      */
     public function update(Request $request, $clientId)
     {
-        $client = $this->clients->findForUser($clientId, $request->user()->getKey());
+        $client = $this->clients->findForUser($clientId, $request->user());
 
         if (! $client) {
             return new Response('', 404);
@@ -102,7 +102,7 @@ class ClientController
      */
     public function destroy(Request $request, $clientId)
     {
-        $client = $this->clients->findForUser($clientId, $request->user()->getKey());
+        $client = $this->clients->findForUser($clientId, $request->user());
 
         if (! $client) {
             return new Response('', 404);

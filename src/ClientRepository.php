@@ -29,16 +29,17 @@ class ClientRepository
     }
 
     /**
-     * Get a client instance for the given ID and user ID.
+     * Get a client instance for the given ID and user.
      *
      * @param  int  $clientId
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Laravel\Passport\Client|null
      */
-    public function findForUser($clientId, $userId)
+    public function findForUser($clientId, $user)
     {
         return Client::where('id', $clientId)
-                     ->where('user_id', $userId)
+                     ->where('user_id', $user)
+                     ->where('user_type', get_class($user))
                      ->first();
     }
 

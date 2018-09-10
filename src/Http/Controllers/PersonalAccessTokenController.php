@@ -81,7 +81,7 @@ class PersonalAccessTokenController
     public function destroy(Request $request, $tokenId)
     {
         $token = $this->tokenRepository->findForUser(
-            $tokenId, $request->user()->getKey()
+            $tokenId, $request->user()
         );
 
         if (is_null($token)) {

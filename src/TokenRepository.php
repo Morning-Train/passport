@@ -30,15 +30,15 @@ class TokenRepository
     }
 
     /**
-     * Get a token by the given user ID and token ID.
+     * Get a token by the given user and token ID.
      *
      * @param  string  $id
-     * @param  int  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Laravel\Passport\Token|null
      */
-    public function findForUser($id, $userId)
+    public function findForUser($id, $user)
     {
-        return Token::where('id', $id)->where('user_id', $userId)->first();
+        return Token::where('id', $id)->where('user_id', $user->getKey())->where('user_type', get_class($user))->first();
     }
 
     /**

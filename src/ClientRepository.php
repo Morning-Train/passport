@@ -87,16 +87,18 @@ class ClientRepository
      * Store a new client.
      *
      * @param  int  $userId
+     * @param  string  $userType
      * @param  string  $name
      * @param  string  $redirect
      * @param  bool  $personalAccess
      * @param  bool  $password
      * @return \Laravel\Passport\Client
      */
-    public function create($userId, $name, $redirect, $personalAccess = false, $password = false)
+    public function create($userId, $userType, $name, $redirect, $personalAccess = false, $password = false)
     {
         $client = (new Client)->forceFill([
             'user_id' => $userId,
+            'user_type' => $userType,
             'name' => $name,
             'secret' => str_random(40),
             'redirect' => $redirect,
@@ -113,27 +115,27 @@ class ClientRepository
     /**
      * Store a new personal access token client.
      *
-     * @param  int  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @param  string  $name
      * @param  string  $redirect
      * @return \Laravel\Passport\Client
      */
-    public function createPersonalAccessClient($userId, $name, $redirect)
+    public function createPersonalAccessClient($user, $name, $redirect)
     {
-        return $this->create($userId, $name, $redirect, true);
+        return $this->create($user->getKey(), get_class($user), $name, $redirect, true);
     }
 
     /**
      * Store a new password grant client.
      *
-     * @param  int  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @param  string  $name
      * @param  string  $redirect
      * @return \Laravel\Passport\Client
      */
-    public function createPasswordGrantClient($userId, $name, $redirect)
+    public function createPasswordGrantClient($user, $name, $redirect)
     {
-        return $this->create($userId, $name, $redirect, false, true);
+        return $this->create($user->getKey(), get_class($user), $name, $redirect, false, true);
     }
 
     /**

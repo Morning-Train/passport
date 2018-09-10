@@ -63,6 +63,7 @@ class TokenRepository
     {
         return $client->tokens()
                     ->whereUserId($user->getKey())
+                    ->whereUserType(get_class($user))
                     ->whereRevoked(0)
                     ->where('expires_at', '>', Carbon::now())
                     ->first();
@@ -117,6 +118,7 @@ class TokenRepository
     {
         return $client->tokens()
                       ->whereUserId($user->getKey())
+                      ->whereUserType(get_class($user))
                       ->whereRevoked(0)
                       ->where('expires_at', '>', Carbon::now())
                       ->latest('expires_at')

@@ -42,14 +42,14 @@ class TokenRepository
     }
 
     /**
-     * Get the token instances for the given user ID.
+     * Get the token instances for the given user.
      *
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function forUser($userId)
+    public function forUser($user)
     {
-        return Token::where('user_id', $userId)->get();
+        return Token::where('user_id', $user->getKey())->where('user_type', get_class($user))->get();
     }
 
     /**

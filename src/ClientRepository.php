@@ -44,26 +44,27 @@ class ClientRepository
     }
 
     /**
-     * Get the client instances for the given user ID.
+     * Get the client instances for the given user.
      *
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function forUser($userId)
+    public function forUser($user)
     {
-        return Client::where('user_id', $userId)
+        return Client::where('user_id', $user->getKey())
+                        ->where('user_type', get_class($user))
                         ->orderBy('name', 'asc')->get();
     }
 
     /**
-     * Get the active client instances for the given user ID.
+     * Get the active client instances for the given user.
      *
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function activeForUser($userId)
+    public function activeForUser($user)
     {
-        return $this->forUser($userId)->reject(function ($client) {
+        return $this->forUser($user)->reject(function ($client) {
             return $client->revoked;
         })->values();
     }

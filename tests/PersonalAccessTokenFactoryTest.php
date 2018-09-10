@@ -27,9 +27,19 @@ class PersonalAccessTokenFactoryTest extends PHPUnit_Framework_TestCase
         $tokens->shouldReceive('find')->with('token')->andReturn($foundToken = new PersonalAccessTokenFactoryTestModelStub);
         $tokens->shouldReceive('save')->with($foundToken);
 
-        $result = $factory->make(1, 'token', ['scopes']);
+		$user = new PersonalAccessTokenFactoryTestStub;
+        $result = $factory->make($user, 'token', ['scopes']);
 
         $this->assertInstanceOf('Laravel\Passport\PersonalAccessTokenResult', $result);
+    }
+}
+
+class PersonalAccessTokenFactoryTestStub
+{
+    use Laravel\Passport\HasApiTokens;
+    public function getKey()
+    {
+        return 1;
     }
 }
 

@@ -31,11 +31,13 @@ class ClientControllerTest extends PHPUnit_Framework_TestCase
         $clients = Mockery::mock('Laravel\Passport\ClientRepository');
 
         $request = Request::create('/', 'GET', ['name' => 'client name', 'redirect' => 'http://localhost']);
-        $request->setUserResolver(function () {
-            return new ClientControllerFakeUser;
+		$user = new ClientControllerFakeUser;
+
+        $request->setUserResolver(function () use ($user) {
+            return $user;
         });
 
-        $clients->shouldReceive('create')->once()->with(1, 'client name', 'http://localhost')->andReturn($client = new Laravel\Passport\Client);
+        $clients->shouldReceive('create')->once()->with($user->getKey(), get_class($user), 'client name', 'http://localhost')->andReturn($client = new Laravel\Passport\Client);
 
         $validator = Mockery::mock('Illuminate\Contracts\Validation\Factory');
         $validator->shouldReceive('make')->once()->with([

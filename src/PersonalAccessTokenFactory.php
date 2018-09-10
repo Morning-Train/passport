@@ -60,7 +60,7 @@ class PersonalAccessTokenFactory
     /**
      * Create a new personal access token.
      *
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @param  string  $name
      * @param  array  $scopes
      * @return \Laravel\Passport\PersonalAccessTokenResult
@@ -88,7 +88,7 @@ class PersonalAccessTokenFactory
      * Create a request instance for the given client.
      *
      * @param  \Laravel\Passport\Client  $client
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @param  array  $scopes
      * @return \Zend\Diactoros\ServerRequest
      */

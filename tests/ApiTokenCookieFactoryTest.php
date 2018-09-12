@@ -21,9 +21,19 @@ class ApiTokenCookieFactoryTest extends PHPUnit_Framework_TestCase
         ]);
         $encrypter = new Encrypter(str_repeat('a', 16));
         $factory = new ApiTokenCookieFactory($config, $encrypter);
+		$user = new ApiTokenCookieFactoryFakeUser;
 
-        $cookie = $factory->make(1, 'token');
+        $cookie = $factory->make($user, 'token');
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+    }
+}
+
+class ApiTokenCookieFactoryFakeUser
+{
+    public $id = 1;
+    public function getKey()
+    {
+        return $this->id;
     }
 }

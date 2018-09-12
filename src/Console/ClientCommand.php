@@ -100,6 +100,10 @@ class ClientCommand extends Command
      */
     protected function createAuthCodeClient(ClientRepository $clients)
     {
+        $userType = $this->ask(
+            'Which user Class should the client be assigned to?'
+        );
+
         $userId = $this->ask(
             'Which user ID should the client be assigned to?'
         );
@@ -114,7 +118,7 @@ class ClientCommand extends Command
         );
 
         $client = $clients->create(
-            $userId, $name, $redirect
+            $userId, $userType, $name, $redirect
         );
 
         $this->info('New client created successfully.');

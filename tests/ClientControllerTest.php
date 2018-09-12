@@ -12,11 +12,12 @@ class ClientControllerTest extends PHPUnit_Framework_TestCase
     public function test_all_the_clients_for_the_current_user_can_be_retrieved()
     {
         $clients = Mockery::mock('Laravel\Passport\ClientRepository');
-        $clients->shouldReceive('activeForUser')->once()->with(1)->andReturn($client = Mockery::mock());
+		$user = new ClientControllerFakeUser();
+        $clients->shouldReceive('activeForUser')->once()->with($user)->andReturn($client = Mockery::mock());
         $client->shouldReceive('makeVisible')->with('secret')->andReturn($client);
 
         $request = Mockery::mock('Illuminate\Http\Request');
-        $request->shouldReceive('user')->andReturn(new ClientControllerFakeUser);
+        $request->shouldReceive('user')->andReturn($user);
 
         $controller = new Laravel\Passport\Http\Controllers\ClientController(
             $clients, Mockery::mock('Illuminate\Contracts\Validation\Factory')
@@ -30,11 +31,13 @@ class ClientControllerTest extends PHPUnit_Framework_TestCase
         $clients = Mockery::mock('Laravel\Passport\ClientRepository');
 
         $request = Request::create('/', 'GET', ['name' => 'client name', 'redirect' => 'http://localhost']);
-        $request->setUserResolver(function () {
-            return new ClientControllerFakeUser;
+		$user = new ClientControllerFakeUser;
+
+        $request->setUserResolver(function () use ($user) {
+            return $user;
         });
 
-        $clients->shouldReceive('create')->once()->with(1, 'client name', 'http://localhost')->andReturn($client = new Laravel\Passport\Client);
+        $clients->shouldReceive('create')->once()->with($user->getKey(), get_class($user), 'client name', 'http://localhost')->andReturn($client = new Laravel\Passport\Client);
 
         $validator = Mockery::mock('Illuminate\Contracts\Validation\Factory');
         $validator->shouldReceive('make')->once()->with([
@@ -57,14 +60,12 @@ class ClientControllerTest extends PHPUnit_Framework_TestCase
     {
         $clients = Mockery::mock('Laravel\Passport\ClientRepository');
         $client = Mockery::mock('Laravel\Passport\Client');
-        $clients->shouldReceive('findForUser')->with(1, 1)->andReturn($client);
+		$user = new ClientControllerFakeUser();
+        $clients->shouldReceive('findForUser')->with(1, $user)->andReturn($client);
 
         $request = Request::create('/', 'GET', ['name' => 'client name', 'redirect' => 'http://localhost']);
 
-        $request->setUserResolver(function () {
-            $user = Mockery::mock();
-            $user->shouldReceive('getKey')->andReturn(1);
-
+        $request->setUserResolver(function () use ($user) {
             return $user;
         });
 
@@ -92,14 +93,12 @@ class ClientControllerTest extends PHPUnit_Framework_TestCase
     public function test_404_response_if_client_doesnt_belong_to_user()
     {
         $clients = Mockery::mock('Laravel\Passport\ClientRepository');
-        $clients->shouldReceive('findForUser')->with(1, 1)->andReturnNull();
+		$user = new ClientControllerFakeUser();
+        $clients->shouldReceive('findForUser')->with(1, $user)->andReturnNull();
 
         $request = Request::create('/', 'GET', ['name' => 'client name', 'redirect' => 'http://localhost']);
 
-        $request->setUserResolver(function () {
-            $user = Mockery::mock();
-            $user->shouldReceive('getKey')->andReturn(1);
-
+        $request->setUserResolver(function () use ($user) {
             return $user;
         });
 
@@ -118,14 +117,12 @@ class ClientControllerTest extends PHPUnit_Framework_TestCase
     {
         $clients = Mockery::mock('Laravel\Passport\ClientRepository');
         $client = Mockery::mock('Laravel\Passport\Client');
-        $clients->shouldReceive('findForUser')->with(1, 1)->andReturn($client);
+		$user = new ClientControllerFakeUser();
+        $clients->shouldReceive('findForUser')->with(1, $user)->andReturn($client);
 
         $request = Request::create('/', 'GET', ['name' => 'client name', 'redirect' => 'http://localhost']);
 
-        $request->setUserResolver(function () {
-            $user = Mockery::mock();
-            $user->shouldReceive('getKey')->andReturn(1);
-
+        $request->setUserResolver(function () use ($user) {
             return $user;
         });
 
@@ -145,14 +142,12 @@ class ClientControllerTest extends PHPUnit_Framework_TestCase
     public function test_404_response_if_client_doesnt_belong_to_user_on_delete()
     {
         $clients = Mockery::mock('Laravel\Passport\ClientRepository');
-        $clients->shouldReceive('findForUser')->with(1, 1)->andReturnNull();
+		$user = new ClientControllerFakeUser();
+        $clients->shouldReceive('findForUser')->with(1, $user)->andReturnNull();
 
         $request = Request::create('/', 'GET', ['name' => 'client name', 'redirect' => 'http://localhost']);
 
-        $request->setUserResolver(function () {
-            $user = Mockery::mock();
-            $user->shouldReceive('getKey')->andReturn(1);
-
+        $request->setUserResolver(function () use ($user) {
             return $user;
         });
 

@@ -30,26 +30,26 @@ class TokenRepository
     }
 
     /**
-     * Get a token by the given user ID and token ID.
+     * Get a token by the given user and token ID.
      *
      * @param  string  $id
-     * @param  int  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Laravel\Passport\Token|null
      */
-    public function findForUser($id, $userId)
+    public function findForUser($id, $user)
     {
-        return Token::where('id', $id)->where('user_id', $userId)->first();
+        return Token::where('id', $id)->where('user_id', $user->getKey())->where('user_type', get_class($user))->first();
     }
 
     /**
-     * Get the token instances for the given user ID.
+     * Get the token instances for the given user.
      *
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function forUser($userId)
+    public function forUser($user)
     {
-        return Token::where('user_id', $userId)->get();
+        return Token::where('user_id', $user->getKey())->where('user_type', get_class($user))->get();
     }
 
     /**
@@ -63,6 +63,7 @@ class TokenRepository
     {
         return $client->tokens()
                     ->whereUserId($user->getKey())
+                    ->whereUserType(get_class($user))
                     ->whereRevoked(0)
                     ->where('expires_at', '>', Carbon::now())
                     ->first();
@@ -117,6 +118,7 @@ class TokenRepository
     {
         return $client->tokens()
                       ->whereUserId($user->getKey())
+                      ->whereUserType(get_class($user))
                       ->whereRevoked(0)
                       ->where('expires_at', '>', Carbon::now())
                       ->latest('expires_at')

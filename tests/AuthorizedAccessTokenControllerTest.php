@@ -87,16 +87,23 @@ class AuthorizedAccessTokenControllerTest extends PHPUnit_Framework_TestCase
     public function test_not_found_response_is_returned_if_user_doesnt_have_token()
     {
         $request = Request::create('/', 'GET');
+		$user = new AuthorizedAccessTokenControllerTestStub();
 
-        $this->tokenRepository->shouldReceive('findForUser')->with(3, 1)->andReturnNull();
+        $this->tokenRepository->shouldReceive('findForUser')->with(3, $user)->andReturnNull();
 
-        $request->setUserResolver(function () {
-            $user = Mockery::mock();
-            $user->shouldReceive('getKey')->andReturn(1);
-
-            return $user;
+        $request->setUserResolver(function () use ($user) {
+			return $user;
         });
 
         $this->assertEquals(404, $this->controller->destroy($request, 3)->status());
+    }
+}
+
+class AuthorizedAccessTokenControllerTestStub
+{
+    use Laravel\Passport\HasApiTokens;
+    public function getKey()
+    {
+        return 1;
     }
 }

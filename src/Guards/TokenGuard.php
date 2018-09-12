@@ -126,6 +126,15 @@ class TokenGuard
                 $psr->getAttribute('oauth_access_token_id')
             );
 
+			// Verify that the retrieved user matches the type of the token owner
+			// as well as the UserProvider used for the guard
+			if (
+				$token->user_type !== get_class($user) ||
+				$token->user_type !== $this->provider->getModel()
+			) {
+				return;
+			}
+
             $clientId = $psr->getAttribute('oauth_client_id');
 
             // Finally, we will verify if the client that issued this token is still valid and
@@ -171,7 +180,17 @@ class TokenGuard
         // If this user exists, we will return this user and attach a "transient" token to
         // the user model. The transient token assumes it has all scopes since the user
         // is physically logged into the application via the application's interface.
-        if ($user = $this->provider->retrieveById($token['sub'])) {
+        if ($user = $this->provider->retrieveById($token['sub']->id)) {
+
+			// Verify that the retrieved user matches the type of the token owner
+			// as well as the UserProvider used for the guard
+			if (
+				$token['sub']->type !== get_class($user) ||
+				$token['sub']->type !== $this->provider->getModel()
+			) {
+				return;
+			}
+
             return $user->withAccessToken(new TransientToken);
         }
     }

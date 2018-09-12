@@ -29,40 +29,42 @@ class ClientRepository
     }
 
     /**
-     * Get a client instance for the given ID and user ID.
+     * Get a client instance for the given ID and user.
      *
      * @param  int  $clientId
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Laravel\Passport\Client|null
      */
-    public function findForUser($clientId, $userId)
+    public function findForUser($clientId, $user)
     {
         return Client::where('id', $clientId)
-                     ->where('user_id', $userId)
+                     ->where('user_id', $user)
+                     ->where('user_type', get_class($user))
                      ->first();
     }
 
     /**
-     * Get the client instances for the given user ID.
+     * Get the client instances for the given user.
      *
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function forUser($userId)
+    public function forUser($user)
     {
-        return Client::where('user_id', $userId)
+        return Client::where('user_id', $user->getKey())
+                        ->where('user_type', get_class($user))
                         ->orderBy('name', 'asc')->get();
     }
 
     /**
-     * Get the active client instances for the given user ID.
+     * Get the active client instances for the given user.
      *
-     * @param  mixed  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function activeForUser($userId)
+    public function activeForUser($user)
     {
-        return $this->forUser($userId)->reject(function ($client) {
+        return $this->forUser($user)->reject(function ($client) {
             return $client->revoked;
         })->values();
     }
@@ -85,16 +87,18 @@ class ClientRepository
      * Store a new client.
      *
      * @param  int  $userId
+     * @param  string  $userType
      * @param  string  $name
      * @param  string  $redirect
      * @param  bool  $personalAccess
      * @param  bool  $password
      * @return \Laravel\Passport\Client
      */
-    public function create($userId, $name, $redirect, $personalAccess = false, $password = false)
+    public function create($userId, $userType, $name, $redirect, $personalAccess = false, $password = false)
     {
         $client = (new Client)->forceFill([
             'user_id' => $userId,
+            'user_type' => $userType,
             'name' => $name,
             'secret' => str_random(40),
             'redirect' => $redirect,
@@ -111,27 +115,27 @@ class ClientRepository
     /**
      * Store a new personal access token client.
      *
-     * @param  int  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @param  string  $name
      * @param  string  $redirect
      * @return \Laravel\Passport\Client
      */
-    public function createPersonalAccessClient($userId, $name, $redirect)
+    public function createPersonalAccessClient($user, $name, $redirect)
     {
-        return $this->create($userId, $name, $redirect, true);
+        return $this->create($user->getKey(), get_class($user), $name, $redirect, true);
     }
 
     /**
      * Store a new password grant client.
      *
-     * @param  int  $userId
+	 * @param  Illuminate\Foundation\Auth\User $user
      * @param  string  $name
      * @param  string  $redirect
      * @return \Laravel\Passport\Client
      */
-    public function createPasswordGrantClient($userId, $name, $redirect)
+    public function createPasswordGrantClient($user, $name, $redirect)
     {
-        return $this->create($userId, $name, $redirect, false, true);
+        return $this->create($user->getKey(), get_class($user), $name, $redirect, false, true);
     }
 
     /**

@@ -72,7 +72,10 @@ class ApiTokenCookieFactory
     protected function createToken($user, $csrfToken, Carbon $expiration)
     {
         return JWT::encode([
-            'sub' => $user->getKey(), // TODO check this works
+			'sub' => [
+				'id' => $user->getKey(),
+				'type' => get_class($user),
+			],
             'csrf' => $csrfToken,
             'expiry' => $expiration->getTimestamp(),
         ], $this->encrypter->getKey());

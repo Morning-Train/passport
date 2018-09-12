@@ -31,7 +31,8 @@ class TokenGuardTest extends PHPUnit_Framework_TestCase
         $psr->shouldReceive('getAttribute')->with('oauth_client_id')->andReturn(1);
         $psr->shouldReceive('getAttribute')->with('oauth_access_token_id')->andReturn('token');
         $userProvider->shouldReceive('retrieveById')->with(1)->andReturn(new TokenGuardTestUser);
-        $tokens->shouldReceive('find')->once()->with('token')->andReturn($token = Mockery::mock());
+        $userProvider->shouldReceive('getModel')->andReturn(TokenGuardTestUser::class);
+        $tokens->shouldReceive('find')->once()->with('token')->andReturn($token = new TokenGuardTestToken);
         $clients->shouldReceive('revoked')->with(1)->andReturn(false);
 
         $user = $guard->user($request);
@@ -99,12 +100,13 @@ class TokenGuardTest extends PHPUnit_Framework_TestCase
         $request->headers->set('X-CSRF-TOKEN', 'token');
         $request->cookies->set('laravel_token',
             $encrypter->encrypt(JWT::encode([
-                'sub' => 1, 'csrf' => 'token',
+                'sub' => ['id' => 1, 'type' => TokenGuardTestUser::class], 'csrf' => 'token',
                 'expiry' => Carbon::now()->addMinutes(10)->getTimestamp(),
-            ], str_repeat('a', 16)))
+            ], str_repeat('a', 16)), false)
         );
 
         $userProvider->shouldReceive('retrieveById')->with(1)->andReturn($expectedUser = new TokenGuardTestUser);
+        $userProvider->shouldReceive('getModel')->andReturn(TokenGuardTestUser::class);
 
         $user = $guard->user($request);
 
@@ -163,4 +165,9 @@ class TokenGuardTest extends PHPUnit_Framework_TestCase
 class TokenGuardTestUser
 {
     use Laravel\Passport\HasApiTokens;
+}
+
+class TokenGuardTestToken
+{
+	public $user_type = 'TokenGuardTestUser';
 }

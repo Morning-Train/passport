@@ -22,10 +22,7 @@ class CreateFreshApiTokenTest extends PHPUnit_Framework_TestCase
         $response = new Response;
 
         $guard = 'guard';
-        $user = Mockery::mock()
-            ->shouldReceive('getKey')
-            ->andReturn($userKey = 1)
-            ->getMock();
+		$user = new CreateFreashApiTokenFakeUser;
 
         $request->shouldReceive('session')->andReturn($session = Mockery::mock());
         $request->shouldReceive('isMethod')->with('GET')->once()->andReturn(true);
@@ -33,7 +30,7 @@ class CreateFreshApiTokenTest extends PHPUnit_Framework_TestCase
         $session->shouldReceive('token')->withNoArgs()->once()->andReturn($token = 't0k3n');
 
         $cookieFactory->shouldReceive('make')
-            ->with($userKey, $token)
+            ->with($user, $token)
             ->once()
             ->andReturn(new \Symfony\Component\HttpFoundation\Cookie(Passport::cookie()));
 
@@ -114,5 +111,14 @@ class CreateFreshApiTokenTest extends PHPUnit_Framework_TestCase
         }
 
         return false;
+    }
+}
+
+class CreateFreashApiTokenFakeUser
+{
+    public $id = 1;
+    public function getKey()
+    {
+        return $this->id;
     }
 }

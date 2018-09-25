@@ -122,7 +122,10 @@ class ClientRepository
      */
     public function createPersonalAccessClient($user, $name, $redirect)
     {
-        return $this->create($user->getKey(), get_class($user), $name, $redirect, true);
+		$user_id	= $user !== null ?  $user->getKey() : null;
+		$user_type	= $user !== null ?  get_class($user) : null;
+
+        return $this->create($user_id, $user_type, $name, $redirect, true);
     }
 
     /**
@@ -135,7 +138,10 @@ class ClientRepository
      */
     public function createPasswordGrantClient($user, $name, $redirect)
     {
-        return $this->create($user->getKey(), get_class($user), $name, $redirect, false, true);
+		$user_id	= $user !== null ?  $user->getKey() : null;
+		$user_type	= $user !== null ?  get_class($user) : null;
+
+        return $this->create($user_id, $user_type, $name, $redirect, false, true);
     }
 
     /**
